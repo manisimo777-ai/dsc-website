@@ -1,0 +1,6 @@
+# Exclude backend folder (not needed for static site)
+backend/
+
+# System files
+.DS_Store
+*.log
