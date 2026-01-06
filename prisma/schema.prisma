@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  etsyId      String   @unique
+  title       String
+  description String?  @db.Text
+  price       Float
+  quantity    Int
+  sku         String?
+  state       String   // active, inactive, draft, etc.
+  url         String?
+
+  // Images
+  images      ProductImage[]
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  etsyCreatedAt  DateTime?
+  etsyUpdatedAt  DateTime?
+
+  // Sync tracking
+  lastSyncedAt   DateTime?
+  syncStatus     String   @default("synced") // synced, pending, error
+
+  @@index([etsyId])
+  @@index([state])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  rank      Int      @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
